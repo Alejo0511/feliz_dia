@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapa de El Castillo, Meta</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    /* Fondo animado tipo burbujas educativas */
+    body {
+      margin: 0; padding: 20px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #a1c4fd;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      overflow-x: hidden;
+      height: 100vh;
+      position: relative;
+    }
+    /* Burbujas animadas */
+    .bubbles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      animation: rise 20s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+    }
+    .bubble:nth-child(1) {
+      left: 10%;
+      width: 60px; height: 60px;
+      animation-duration: 15s;
+      animation-delay: 0s;
+    }
+    .bubble:nth-child(2) {
+      left: 20%;
+      width: 100px; height: 100px;
+      animation-duration: 25s;
+      animation-delay: 3s;
+    }
+    .bubble:nth-child(3) {
+      left: 35%;
+      width: 40px; height: 40px;
+      animation-duration: 20s;
+      animation-delay: 1s;
+    }
+    .bubble:nth-child(4) {
+      left: 50%;
+      width: 70px; height: 70px;
+      animation-duration: 22s;
+      animation-delay: 4s;
+    }
+    .bubble:nth-child(5) {
+      left: 65%;
+      width: 90px; height: 90px;
+      animation-duration: 18s;
+      animation-delay: 6s;
+    }
+    .bubble:nth-child(6) {
+      left: 80%;
+      width: 50px; height: 50px;
+      animation-duration: 28s;
+      animation-delay: 2s;
+    }
+    .bubble:nth-child(7) {
+      left: 90%;
+      width: 100px; height: 100px;
+      animation-duration: 20s;
+      animation-delay: 5s;
+    }
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0) scale(1);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.5;
+      }
+      100% {
+        bottom: 110%;
+        transform: translateX(30px) scale(1.1);
+        opacity: 0;
+      }
+    }
+    #container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 20px;
+      max-width: 1100px;
+      width: 100%;
+      margin-top: 30px;
+    }
+    #map {
+      width: 600px;
+      height: 450px;
+      border: 2px solid #4a5568;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      background: white;
+      z-index: 1;
+    }
+    #description {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #4a5568;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.95);
+      font-size: 14px;
+      color: #333;
+      height: 450px;
+      overflow-y: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 1;
+    }
+    #formTitulo {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      max-width: 1100px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+    #tituloInput {
+      flex-grow: 1;
+      padding: 5px;
+      font-size: 14px;
+      z-index: 1;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+      color: #fff;
+      transition: 0.2s ease-in;
+      z-index: 1;
+    }
+    #guardarBtn { background: #2563eb; box-shadow: 0 4px #1e3a8a; }
+    #guardarBtn:hover { background: #1d4ed8; transform: translateY(-2px); }
+    #borrarTodosBtn { background: #dc2626; box-shadow: 0 4px #7f1d1d; }
+    #borrarTodosBtn:hover { background: #b91c1c; transform: translateY(-2px); }
+    #borrarSeleccionadoBtn { background: #f59e0b; box-shadow: 0 4px #92400e; }
+    #borrarSeleccionadoBtn:hover { background: #d97706; transform: translateY(-2px); }
+    #listaLugares {
+      margin-top: 20px;
+      padding: 15px;
+      max-width: 1100px;
+      width: 100%;
+      border: 2px solid #4a5568;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.95);
+      max-height: none;
+      height: auto;
+      min-height: 600px; /* mucho más grande */
+      overflow-y: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 1;
+      font-size: 16px;
+    }
+    #listaLugares h3 {
+      margin: 0 0 10px;
+      z-index: 1;
+    }
+    #lugaresUl {
+      list-style: none;
+      padding: 0;
+      font-size: 16px;
+      z-index: 1;
+    }
+    #lugaresUl li {
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 16px;
+      z-index: 1;
+    }
+    .custom-label {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <div id="container">
+    <div id="map"></div>
+    <div id="description">
+      <h3>Instrucciones</h3>
+      <p>Selecciona una ubicación en el mapa y ponle un nombre. Luego puedes guardarla en la lista.</p>
+      <p>Usa los botones para <strong>agregar</strong> la ubicación, <strong>borrar todas</strong> las guardadas o <strong>eliminar una seleccionada</strong>.</p>
+     
+      <p>Este Mapa es solo educativo hecho por la docente <strong>Yaritza </strong>  para los estudiantes </p>
+      <br>
+    
+      <p> <strong>Tu estudio de hoy es una inversión para el mañana </strong> </p>
+    </div>
+  </div>
+
+  <div id="formTitulo">
+    <label for="tituloInput">Título:</label>
+    <input id="tituloInput" type="text" placeholder="Ingrese un título..." />
+    <button id="guardarBtn" disabled>Agregar</button>
+    <button id="borrarSeleccionadoBtn" disabled>Borrar ubicación seleccionada</button>
+    <button id="borrarTodosBtn" disabled>Borrar todo</button>
+  </div>
+
+  <div id="listaLugares">
+    <h3>Lugares guardados:</h3>
+    <ul id="lugaresUl"></ul>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    var map = L.map('map').setView([3.5648, -73.7943], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+
+    var redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    var blueIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    // Marcadores predefinidos
+    var malabar = L.marker([3.5900, -73.8000], {icon: blueIcon}).addTo(map);
+    malabar.bindPopup('Escuela Malabar');
+    malabar.bindTooltip('Escuela Malabar', {permanent: true, direction: 'top'});
+
+    
+
+    // Etiquetas textuales para zonas
+    var veredaMalabarLabel = L.marker([3.5935, -73.8015], {
+      icon: L.divIcon({
+        className: 'custom-label',
+        html: '<div style="background-color: rgba(255,255,255,0.8); padding: 3px 6px; border-radius: 5px; border: 1px solid #333; font-weight: bold; font-size: 13px;">Vereda Malabar</div>',
+        iconSize: [110, 24],
+        iconAnchor: [55, 12]
+      })
+    }).addTo(map);
+
+    var cascoUrbanoLabel = L.marker([3.5655, -73.7900], {
+      icon: L.divIcon({
+        className: 'custom-label',
+        html: '<div style="background-color: rgba(255,255,255,0.8); padding: 3px 6px; border-radius: 5px; border: 1px solid #333; font-weight: bold; font-size: 13px;">Casco Urbano El Castillo</div>',
+        iconSize: [140, 24],
+        iconAnchor: [70, 12]
+      })
+    }).addTo(map);
+
+    var userMarkers = [];
+    var selectedMarkerTemp = null;
+    var currentSelectedLatLng = null;
+    var markerSeleccionado = null;
+
+    var guardarBtn = document.getElementById('guardarBtn');
+    var borrarTodosBtn = document.getElementById('borrarTodosBtn');
+    var borrarSeleccionadoBtn = document.getElementById('borrarSeleccionadoBtn');
+    var tituloInput = document.getElementById('tituloInput');
+    var lugaresUl = document.getElementById('lugaresUl');
+
+    var emojis = ["📚", "🎓", "✏️", "🖍️", "📖", "📝", "🏫", "🎒", "📘", "🔎", "📙", "💼", "📏", "📐", "✂", "🎻🎸", "⚽", "✨", "🎭","🕮"];
+    function emojiAleatorio() {
+      return emojis[Math.floor(Math.random() * emojis.length)];
+    }
+
+    function placeSelectedMarker(lat, lng) {
+      if(selectedMarkerTemp) {
+        map.removeLayer(selectedMarkerTemp);
+      }
+      currentSelectedLatLng = L.latLng(lat, lng);
+      selectedMarkerTemp = L.marker(currentSelectedLatLng, {icon: redIcon}).addTo(map);
+      selectedMarkerTemp.bindPopup('Ubicación seleccionada<br>Lat: ' + lat.toFixed(5) + '<br>Lng: ' + lng.toFixed(5)).openPopup();
+      guardarBtn.disabled = false;
+      tituloInput.value = '';
+      tituloInput.focus();
+    }
+
+    map.on('click', function(e){
+      placeSelectedMarker(e.latlng.lat, e.latlng.lng);
+    });
+
+    guardarBtn.onclick = function() {
+      if(selectedMarkerTemp) {
+        var titulo = tituloInput.value.trim();
+        if (!titulo) {
+          alert("Por favor ingrese un título para la ubicación.");
+          tituloInput.focus();
+          return;
+        }
+        var marker = selectedMarkerTemp;
+        selectedMarkerTemp = null;
+        marker.unbindPopup();
+        marker.bindPopup('<b>' + titulo + '</b><br>Lat: ' + marker.getLatLng().lat.toFixed(5) + '<br>Lng: ' + marker.getLatLng().lng.toFixed(5));
+        marker.setIcon(blueIcon);
+        marker.on('click', function() {
+          marker.openPopup();
+          markerSeleccionado = marker;
+          borrarSeleccionadoBtn.disabled = false;
+        });
+        userMarkers.push({ marker: marker, title: titulo });
+        agregarALaLista(titulo);
+        guardarBtn.disabled = true;
+        borrarTodosBtn.disabled = false;
+        tituloInput.value = '';
+        saveMarkersToStorage();
+        alert('Ubicación guardada con título: "' + titulo + '"');
+      }
+    };
+
+    function agregarALaLista(nombre) {
+      var li = document.createElement('li');
+      li.textContent = emojiAleatorio() + " " + nombre;
+      lugaresUl.appendChild(li);
+    }
+
+    function actualizarLista() {
+      lugaresUl.innerHTML = '';
+      userMarkers.forEach(item => {
+        agregarALaLista(item.title);
+      });
+    }
+
+    function saveMarkersToStorage() {
+      var storageData = userMarkers.map(item => {
+        return {
+          lat: item.marker.getLatLng().lat,
+          lng: item.marker.getLatLng().lng,
+          title: item.title
+        };
+      });
+      localStorage.setItem('userMarkers', JSON.stringify(storageData));
+    }
+
+    function loadMarkersFromStorage() {
+      var saved = localStorage.getItem('userMarkers');
+      if (saved){
+        var markersData = JSON.parse(saved);
+        markersData.forEach(function(item){
+          var marker = L.marker([item.lat, item.lng], {icon: blueIcon}).addTo(map);
+          marker.bindPopup('<b>' + item.title + '</b><br>Lat: ' + item.lat.toFixed(5) + '<br>Lng: ' + item.lng.toFixed(5));
+          marker.on('click', function(){
+            marker.openPopup();
+            markerSeleccionado = marker;
+            borrarSeleccionadoBtn.disabled = false;
+          });
+          userMarkers.push({ marker: marker, title: item.title });
+        });
+        if (userMarkers.length > 0) {
+          borrarTodosBtn.disabled = false;
+          actualizarLista();
+        }
+      }
+    }
+
+    borrarTodosBtn.onclick = function() {
+      userMarkers.forEach(function(item){
+        map.removeLayer(item.marker);
+      });
+      userMarkers = [];
+      lugaresUl.innerHTML = '';
+      borrarTodosBtn.disabled = true;
+      borrarSeleccionadoBtn.disabled = true;
+      guardarBtn.disabled = true;
+      tituloInput.value = '';
+      localStorage.removeItem('userMarkers');
+      alert('Todas las ubicaciones guardadas han sido eliminadas.');
+    };
+
+    borrarSeleccionadoBtn.onclick = function() {
+      if(markerSeleccionado) {
+        map.removeLayer(markerSeleccionado);
+        userMarkers = userMarkers.filter(i => i.marker !== markerSeleccionado);
+        markerSeleccionado = null;
+        borrarSeleccionadoBtn.disabled = true;
+        saveMarkersToStorage();
+        actualizarLista();
+        if(userMarkers.length === 0){
+          borrarTodosBtn.disabled = true;
+        }
+        alert('Ubicación seleccionada eliminada.');
+      }
+    };
+
+    loadMarkersFromStorage();
+  </script>
+</body>
+</html>
+ 
