@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para ti, amiga ❤️</title>
+<meta name="theme-color" content="#fbe3e8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Great+Vibes&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- Navegación sencilla (aparece después de entrar) -->
+<nav class="nav" id="nav" hidden aria-label="Navegación">
+  <button data-go="carta">
+  <button data-go="mundo"> 
+  <button data-go="refugio">
+</nav>
+
+<main>
+
+  <!-- ============ 1. INICIO DE SESIÓN ============ -->
+  <section class="page active" id="login">
+    <div class="login-wrap">
+      <form class="card login-card" id="loginForm" autocomplete="off" novalidate>
+        <div class="monogram" aria-hidden="true">❤</div>
+        <p class="script">Tengo una sorpresa preparada especialmente para ti ❤️</p>
+        <label class="field">
+          <span class="field-icon" aria-hidden="true">🦝</span>
+          <input type="text" id="user" placeholder="Usuario" autocapitalize="none" autocomplete="off" spellcheck="false" aria-label="Usuario">
+        </label>
+        <label class="field">
+          <span class="field-icon" aria-hidden="true">🔑</span>
+          <input type="password" id="pass" placeholder="Contraseña" autocomplete="off" aria-label="Contraseña">
+        </label>
+        <p class="login-msg" id="loginMsg" role="alert"></p>
+        <button type="submit" class="btn btn-rose">Entrar a mi mundo</button>
+        <p class="tiny">Pista: una fecha muy especial ✨</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ 2. CARTA ============ -->
+  <section class="page" id="carta">
+    <div class="carta-wrap">
+
+      <div class="envelope-wrap" id="envelopeWrap">
+        <button class="envelope" id="envelope" aria-label="Abrir el sobre">
+          <span class="env-back"></span>
+          <span class="env-paper"></span>
+          <span class="env-front"></span>
+          <span class="env-flap"></span>
+          <span class="seal">❤</span>
+        </button>
+        <p class="hint">Toca el sobre para abrirlo 💌</p>
+      </div>
+
+      <article class="letter" id="letter" hidden>
+        <div class="letter-deco tl">✿</div>
+        <div class="letter-deco tr">❀</div>
+        <h1 class="script big">Querida amiga:</h1>
+        Feliz cumpleaños, Joce! ✨🎂 Pensar en ti es pensar en alguien que siempre está ahí: que nos ayuda, que nos da ánimo en los días grises, que se preocupa por nosotros de verdad y que nos regala un cariño tan sincero que se siente cerquita, sin importar los kilómetros que nos separen. Te has convertido en una pieza fundamental para nosotros. Gracias por tu energía, por tu apañe constante y por el corazón tan bonito que tienes. Te queremos un montón y hoy celebramos tu vida con el alma. Que este año te devuelva el doble de todo el bien que siembras en los demás. Ojalá la vida nos cruce muy pronto para darte ese abrazo en persona que tanto nos debemos. ¡Disfruta al máximo tu día! ❤️🥂 
+Atentamente Ryu y turismo
+        <p class="sign script">Tus amigos, siempre ❤️</p>
+        <div class="letter-end">
+          <button class="btn btn-gold" id="toMundo">Descubre tu sorpresa ❤️</button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ 3. NUESTRO PEQUEÑO MUNDO ============ -->
+  <section class="page" id="mundo">
+    <div class="mundo-wrap">
+      <header class="section-head">
+        <h2 class="script big"> tu pequeño mundo</h2>
+        <p class="sub">Un rinconcito creado solo para ti</p>
+      </header>
+
+      <!-- Piñata -->
+      <div class="block pinata-block">
+        <h3 class="block-title">Una sorpresa para ti</h3>
+        <p class="hint" id="pinataHint">Toca la piñata para romperla 🎉</p>
+        <div class="pinata-stage" id="pinataStage">
+          <button class="pinata-wrap" id="pinata" aria-label="Golpear la piñata">
+            <span class="swing" id="swing">
+              <span class="half left" id="halfL"></span>
+              <span class="half right" id="halfR"></span>
+            </span>
+          </button>
+        </div>
+        <div class="pinata-msg" id="pinataMsg" hidden>
+          <p class="script med">¡Sorpresa, amiga!</p>
+          <p>Cada corazón que salió de esta piñata es un motivo por el que te apreciamos: tu risa, tu dulzura, tu valentía y tu forma de hacermenos sentir tan afortunados de tenerte como amiga. Eres un regalo en nuestras vidas. ❤️</p>
+          <button class="link-btn" id="pinataReset">Volver a colgarla 🪅</button>
+        </div>
+      </div>
+
+      <!-- Música -->
+      <div class="block player-block">
+        <h3 class="block-title">Tu canción</h3>
+        <div class="player card">
+          <div class="disc" id="disc" aria-hidden="true"><span>❤</span></div>
+          <div class="player-main">
+            <p class="song-title" id="songTitle">Tu canción favorita</p>
+            <div class="seek-row">
+              <span class="time" id="tCur">0:00</span>
+              <input type="range" id="seek" min="0" max="100" value="0" step="0.1" aria-label="Progreso de la canción">
+              <span class="time" id="tDur">0:00</span>
+            </div>
+            <button class="round-btn" id="songBtn" aria-label="Reproducir canción">▶</button>
+          </div>
+          <audio id="song" src="musica.mp3" preload="metadata"></audio>
+        </div>
+        <p class="audio-note" id="songNote" hidden>No se pudo cargar la canción. Revisa que el archivo <b>musica.mp3</b> exista.</p>
+      </div>
+
+      <!-- Galería -->
+      <div class="block gallery-block">
+        <h3 class="block-title">Galeria para darle vida a tu regalo</h3>
+        <p class="hint">Toca cada foto para verla más grande 💕</p>
+        <div class="gallery" id="gallery"></div>
+      </div>
+
+      <!-- Botón al lugar secreto -->
+      <div class="secret-end">
+        <button class="btn btn-secret" id="toRefugio">Cuando tengas ansiedad, entra a tu lugar secreto ❤️</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. REFUGIO JUNTO AL MAR ============ -->
+  <section class="page" id="refugio">
+    <div class="beach" id="beach">
+      <div class="sky"></div>
+      <div class="sun"></div>
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="sea"></div>
+      <div class="glints" id="glints"></div>
+      <div class="sand"></div>
+      <img class="beach-photo" src="playa.jpeg" alt="" onerror="this.remove()">
+      <svg class="waves" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true">
+        <path class="w w1" d="M0,90 C180,40 360,140 540,90 C720,40 900,140 1080,90 C1260,40 1440,120 1620,90 C1800,40 1980,140 2160,90 C2340,40 2520,140 2880,90 L2880,200 L0,200 Z"/>
+        <path class="w w2" d="M0,110 C200,150 400,60 600,110 C800,160 1000,60 1200,110 C1400,160 1600,60 1800,110 C2000,160 2200,60 2400,110 C2600,160 2700,80 2880,110 L2880,200 L0,200 Z"/>
+        <path class="w w3" d="M0,140 C240,110 480,170 720,140 C960,110 1200,170 1440,140 C1680,110 1920,170 2160,140 C2400,110 2640,170 2880,140 L2880,200 L0,200 Z"/>
+      </svg>
+      <div class="beach-title">
+        <h2 class="script big">Tu refugio junto al mar</h2>
+      </div>
+    </div>
+
+    <div class="refugio-wrap">
+      <div class="card sea-player">
+        <button class="round-btn" id="seaBtn" aria-label="Reproducir sonido del mar">▶</button>
+        <div class="sea-info">
+          <p class="song-title">Sonido del mar</p>
+          <div class="vol-row">
+            <span aria-hidden="true">🔈</span>
+            <input type="range" id="vol" min="0" max="1" step="0.01" value="0.6" aria-label="Volumen">
+            <span aria-hidden="true">🔊</span>
+          </div>
+        </div>
+        <audio id="seaAudio" src="playa.mp3" preload="auto" loop></audio>
+      </div>
+
+      <div class="breath" id="breath" aria-hidden="true">
+        <div class="breath-circle"><span id="breathText">Inhala…</span></div>
+      </div>
+
+      <div class="card calm-card">
+        <p class="calm-text">Respira, amiga. No tienes que resolverlo todo ahora. Tómate tu tiempo, descansa y recuerda que eres una persona maravillosa. Incluso en los días difíciles sigues siendo increíble. Cierra los ojitos, escucha el sonido del mar e imagina que estamos aquí juntos, lejos de todas las preocupaciones. Este es nuestro pequeño refugio. Siempre mereces paz, amor y tranquilidad. ❤️</p>
+      </div>
+
+      <button class="btn btn-sea" id="backMundo">Volver</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- Visor de fotos -->
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" id="lbClose" aria-label="Cerrar">✕</button>
+  <button class="lb-nav prev" id="lbPrev" aria-label="Anterior">‹</button>
+  <figure class="lb-fig" id="lbFig">
+    <img id="lbImg" alt="">
+    <figcaption id="lbCap"></figcaption>
+    <p class="lb-count" id="lbCount"></p>
+  </figure>
+  <button class="lb-nav next" id="lbNext" aria-label="Siguiente">›</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
